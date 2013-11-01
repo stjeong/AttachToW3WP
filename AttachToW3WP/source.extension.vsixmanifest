@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+    <Metadata>
+        <Identity Id="21c8e832-0ac8-4e66-9de5-594c89569990" Version="1.0" Language="en-US" Publisher="www.sysnet.pe.kr" />
+        <DisplayName>AttachToW3WP</DisplayName>
+        <Description xml:space="preserve">Attaching to w3wp.exe before loading .NET CLR in IIS 8.0 or later.
+
+Use this command instead of F5 debugging on Web Application Project.
+    </Description>
+        <MoreInfo>https://github.com/stjeong/AttachToW3WP</MoreInfo>
+        <Icon>icon_64.ico</Icon>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Version="[11.0,12.0]" Id="Microsoft.VisualStudio.Pro" />
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="4.5" />
+        <Dependency Id="Microsoft.VisualStudio.MPF.11.0" DisplayName="Visual Studio MPF 11.0" d:Source="Installed" Version="11.0" />
+    </Dependencies>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    </Assets>
+</PackageManifest>

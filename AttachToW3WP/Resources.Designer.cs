@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace wwwsysnetpekr.AttachDebug {
+namespace wwwsysnetpekr.AttachToW3WP {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace wwwsysnetpekr.AttachDebug {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("wwwsysnetpekr.AttachDebug.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("wwwsysnetpekr.AttachToW3WP.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

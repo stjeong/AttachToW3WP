@@ -25,7 +25,7 @@
 
   <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
-  <Commands package="guidAttachDebugPkg">
+  <Commands package="guidAttachToW3WPPkg">
     <!-- Inside this section we have different sub-sections: one for the menus, another  
     for the menu groups, one for the buttons (the actual commands), one for the combos 
     and the last one for the bitmaps used. Each element is identified by a command id that  
@@ -41,7 +41,7 @@
          must be a menu. -->
     <Groups>
 
-      <Group guid="guidAttachDebugCmdSet" id="MyMenuGroup" priority="0x0600">
+      <Group guid="guidAttachToW3WPCmdSet" id="MyMenuGroup" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
       </Group>
       
@@ -61,15 +61,15 @@
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
 
-      <Button guid="guidAttachDebugCmdSet" id="cmdidAttachDebug" priority="0x0100" type="Button">
-        <Parent guid="guidAttachDebugCmdSet" id="MyMenuGroup" />
+      <Button guid="guidAttachToW3WPCmdSet" id="cmdidAttachToW3WP" priority="0x0100" type="Button">
+        <Parent guid="guidAttachToW3WPCmdSet" id="MyMenuGroup" />
         <!--Icon guid="guidImages" id="bmpPic1" /-->
 
 
         <Icon guid="buttonImages" id="bmpMain" />
 
         <Strings>
-          <ButtonText>AttachDebug</ButtonText>
+          <ButtonText>AttachToW3WP</ButtonText>
         </Strings>
       </Button>
 
@@ -97,13 +97,13 @@
 
   <Symbols>
     <!-- This is the package guid. -->
-    <GuidSymbol name="guidAttachDebugPkg" value="{21c8e832-0ac8-4e66-9de5-594c89569990}" />
+    <GuidSymbol name="guidAttachToW3WPPkg" value="{21c8e832-0ac8-4e66-9de5-594c89569990}" />
     
     <!-- This is the guid used to group the menu commands together -->
-    <GuidSymbol name="guidAttachDebugCmdSet" value="{50d58cc5-e5bf-4008-8201-2a095675e7fa}">
+    <GuidSymbol name="guidAttachToW3WPCmdSet" value="{50d58cc5-e5bf-4008-8201-2a095675e7fa}">
 
       <IDSymbol name="MyMenuGroup" value="0x1020" />
-      <IDSymbol name="cmdidAttachDebug" value="0x0100" />
+      <IDSymbol name="cmdidAttachToW3WP" value="0x0100" />
     </GuidSymbol>
 
     <GuidSymbol name="buttonImages" value="{f61a0aec-e6e8-487a-952a-dfdeeb417226}">

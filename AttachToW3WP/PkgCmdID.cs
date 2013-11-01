@@ -2,11 +2,11 @@
 // MUST match PkgCmdID.h
 using System;
 
-namespace wwwsysnetpekr.AttachDebug
+namespace wwwsysnetpekr.AttachToW3WP
 {
     static class PkgCmdIDList
     {
-        public const uint cmdidAttachDebug =        0x100;
+        public const uint cmdidAttachToW3WP = 0x100;
 
 
     };

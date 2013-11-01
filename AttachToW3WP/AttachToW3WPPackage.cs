@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using Microsoft.Web.Administration;
 using EnvDTE80;
 
-namespace wwwsysnetpekr.AttachDebug
+namespace wwwsysnetpekr.AttachToW3WP
 {
     // free icon: https://www.iconfinder.com/icons/199499/play_social_video_youtube_icon#size=128
 
@@ -36,8 +36,8 @@ namespace wwwsysnetpekr.AttachDebug
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [Guid(GuidList.guidAttachDebugPkgString)]
-    public sealed class AttachDebugPackage : Package
+    [Guid(GuidList.guidAttachToW3WPPkgString)]
+    public sealed class AttachToW3WPPackage : Package
     {
         /// <summary>
         /// Default constructor of the package.
@@ -46,7 +46,7 @@ namespace wwwsysnetpekr.AttachDebug
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public AttachDebugPackage()
+        public AttachToW3WPPackage()
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
@@ -68,8 +68,6 @@ namespace wwwsysnetpekr.AttachDebug
             Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
-            // _applicationObject = (EnvDTE80.DTE2)System.Runtime.InteropServices.Marshal.GetActiveObject("VisualStudio.DTE.11.0");
-
             _applicationObject = (EnvDTE80.DTE2)this.GetService(typeof(EnvDTE.DTE));
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
@@ -77,7 +75,7 @@ namespace wwwsysnetpekr.AttachDebug
             if ( null != mcs )
             {
                 // Create the command for the menu item.
-                CommandID menuCommandID = new CommandID(GuidList.guidAttachDebugCmdSet, (int)PkgCmdIDList.cmdidAttachDebug);
+                CommandID menuCommandID = new CommandID(GuidList.guidAttachToW3WPCmdSet, (int)PkgCmdIDList.cmdidAttachToW3WP);
                 MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID );
                 mcs.AddCommand( menuItem );
             }
@@ -109,7 +107,7 @@ namespace wwwsysnetpekr.AttachDebug
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(uiShell.ShowMessageBox(
                        0,
                        ref clsid,
-                       "AttachDebug",
+                       "AttachToW3WP",
                        string.Format(CultureInfo.CurrentCulture, txt, this.ToString()),
                        string.Empty,
                        0,
@@ -220,7 +218,7 @@ namespace wwwsysnetpekr.AttachDebug
 
         private void AttachToW3wp(List<int> currentWorkerProcess)
         {
-            System.Diagnostics.Trace.WriteLine("AttachToW3wp ...");
+            System.Diagnostics.Trace.WriteLine("AttachToW3WP ...");
 
             foreach (var proc in _applicationObject.Debugger.LocalProcesses)
             {
