@@ -65,19 +65,19 @@ namespace wwwsysnetpekr.AttachToW3WP
         /// </summary>
         protected override void Initialize()
         {
-            Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+            Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
             _applicationObject = (EnvDTE80.DTE2)this.GetService(typeof(EnvDTE.DTE));
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if ( null != mcs )
+            if (null != mcs)
             {
                 // Create the command for the menu item.
                 CommandID menuCommandID = new CommandID(GuidList.guidAttachToW3WPCmdSet, (int)PkgCmdIDList.cmdidAttachToW3WP);
-                MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID );
-                mcs.AddCommand( menuItem );
+                MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
+                mcs.AddCommand(menuItem);
             }
         }
         #endregion
@@ -146,6 +146,8 @@ namespace wwwsysnetpekr.AttachToW3WP
                         string sitePath = string.Format("/LM/W3SVC/{0}/ROOT{1}/",
                             site.Id, app.Path);
 
+                        sitePath = sitePath.Replace("//", "/");
+
                         if (sitePath == appPoolToRecycle)
                         {
                             appPoolName = app.ApplicationPoolName;
@@ -166,13 +168,14 @@ namespace wwwsysnetpekr.AttachToW3WP
 
                 foreach (ApplicationPool appPool in svr.ApplicationPools)
                 {
+                    foreach (var item in appPool.WorkerProcesses)
+                    {
+                        currentProcessList.Add(item.ProcessId);
+                        Trace.WriteLine("No attach to: " + item.ProcessId);
+                    }
+
                     if (appPool.Name == appPoolName)
                     {
-                        foreach (var item in appPool.WorkerProcesses)
-                        {
-                            currentProcessList.Add(item.ProcessId);
-                        }
-
                         try
                         {
                             appPool.Recycle();
@@ -207,9 +210,21 @@ namespace wwwsysnetpekr.AttachToW3WP
             foreach (var prop in prj.Properties)
             {
                 Property property = prop as Property;
+
+                object objValue = null;
+
+                try
+                {
+                    objValue = property.Value;
+                }
+                catch
+                {
+                    objValue = "";
+                }
+
                 if (property.Name == propName)
                 {
-                    return property.Value as string;
+                    return objValue as string;
                 }
             }
 
@@ -219,6 +234,28 @@ namespace wwwsysnetpekr.AttachToW3WP
         private void AttachToW3wp(List<int> currentWorkerProcess)
         {
             System.Diagnostics.Trace.WriteLine("AttachToW3WP ...");
+
+            EnvDTE90.Debugger3 dbg2 = _applicationObject.Debugger as EnvDTE90.Debugger3;
+            EnvDTE80.Transport transport = dbg2.Transports.Item("Default");
+
+            EnvDTE80.Engine dbgEngine = null;
+
+            string targetVersion = GetFrameworkVersion();
+
+            foreach (EnvDTE80.Engine item in transport.Engines)
+            {
+                if (item.Name.IndexOf(targetVersion) != -1)
+                {
+                    dbgEngine = item;
+                    break;
+                }
+            }
+
+            if (dbgEngine == null)
+            {
+                ShowMessage("Can't determine project's TargetFrameworkVersion - " + targetVersion);
+                return;
+            }
 
             foreach (var proc in _applicationObject.Debugger.LocalProcesses)
             {
@@ -237,12 +274,13 @@ namespace wwwsysnetpekr.AttachToW3WP
                 if (process.Name.IndexOf("W3WP.EXE", 0, StringComparison.OrdinalIgnoreCase) != -1)
                 {
                     bool attached = false;
-                    System.Diagnostics.Trace.WriteLine("Attaching to: " + process.Name);
+                    string txt = string.Format("{0}({1})", process.Name, process.ProcessID);
+                    System.Diagnostics.Trace.WriteLine("Attaching to: " + txt);
                     try
                     {
-                        process.Attach();
+                        process.Attach2(dbgEngine);
                         attached = true;
-                        System.Diagnostics.Trace.WriteLine("Attached to: " + process.Name);
+                        System.Diagnostics.Trace.WriteLine("Attached to: " + txt);
                     }
                     catch
                     {
@@ -260,6 +298,24 @@ namespace wwwsysnetpekr.AttachToW3WP
                     break;
                 }
             }
+        }
+
+        private string GetFrameworkVersion()
+        {
+            string txt = GetProjectItemValue("TargetFramework");
+
+            int result;
+            if (Int32.TryParse(txt, out result) == false)
+            {
+                return "Managed";
+            }
+
+            txt = result.ToString("X");
+
+            string major = txt.Substring(0, 1);
+            string minor = txt.Substring(1, 1);
+
+            return string.Format("v{0}.{1}", major, minor);
         }
 
         // http://social.msdn.microsoft.com/Forums/vstudio/en-US/36adcd56-5698-43ca-bcba-4527daabb2e3/finding-the-startup-project-in-a-complicated-solution
