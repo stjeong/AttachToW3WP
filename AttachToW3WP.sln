@@ -11,6 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttachToW3WP", "AttachToW3WP\AttachToW3WP.csproj", "{C8647085-D510-4718-8683-D5821F7E534C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7D9F25C6-667F-4762-BCCD-889CDFA6A1ED}"
+	ProjectSection(SolutionItems) = preProject
+		introduce.txt = introduce.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html><div style='display: inline'>
+<h1 ext='true' style='font-family: Malgun Gothic, Consolas; font-size: 20pt; color: #006699; text-align: center; font-weight: bold'>AttachToW3WP</h1>
+<p>
+<br /><div style='font-size: 12pt; font-family: Malgun Gothic, Consolas; color: #2211AA; text-align: left; font-weight: bold'>Introduce</div>
+<br />
+Can attach to w3wp.exe before loading of ASP.NET pipeline. It enables Visual Studio to activate breakpoint on initial .NET code like global.asax.cs or whatever.<br />
+<br />
+<br />
+<br />
+<br /><div style='font-size: 12pt; font-family: Malgun Gothic, Consolas; color: #2211AA; text-align: left; font-weight: bold'>What's New</div>
+<br />
+V 1.0: Initial checked-in.<br />
+<br />
+<br />
+<br />
+<br /><div style='font-size: 12pt; font-family: Malgun Gothic, Consolas; color: #2211AA; text-align: left; font-weight: bold'>How to use</div>
+<br />
+1. When your web application project use 'Use Local IIS Web server' options as follows,<br />
+<br />
+<img alt='http://res.sysnet.pe.kr/sysnetimages/vs2010_net20_iis_1.png' src='http://res.sysnet.pe.kr/sysnetimages/vs2010_net20_iis_1.png' />
+<br />
+<br />
+2. You have to set "Start Mode" == "AlwaysRunning" on AppPool which is hosting the web application.<br />
+<br />
+<img alt='http://res.sysnet.pe.kr/sysnetimages/iis80_net40_1.png' src='http://res.sysnet.pe.kr/sysnetimages/iis80_net40_1.png' />
+<br />
+<br />
+3. Then you just select "TOOLS" / "AttachToW3WP" menu,<br />
+<br />
+<img alt='http://res.sysnet.pe.kr/sysnetimages/attach_to_w3wp_1.png' src='http://res.sysnet.pe.kr/sysnetimages/attach_to_w3wp_1.png' />
+<br />
+<br />
+4. Your breakpoint on code inside global.asax.cs or any initialization will be caught by Visual Studio debugger.<br />
+<br />
+<img alt='http://res.sysnet.pe.kr/sysnetimages/attach_to_w3wp_2.png' src='http://res.sysnet.pe.kr/sysnetimages/attach_to_w3wp_2.png' />
+<br />
+<br />
+<br /><div style='font-size: 12pt; font-family: Malgun Gothic, Consolas; color: #2211AA; text-align: left; font-weight: bold'>Source Code</div>
+<br />
+Project site:  <a target='tab' href='https://github.com/stjeong/AttachToW3WP'>https://github.com/stjeong/AttachToW3WP</a><br />
+For more information in Korean: <a target='tab' href='http://www.sysnet.pe.kr/2/0/1523'>Visual Studio 확장 도구 AttachToW3WP - w3wp.exe에 대한 디버거 연결을 자동화</a><br />
+</p><br />
+<br />
+
+</div></html>
