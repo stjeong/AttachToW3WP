@@ -8,10 +8,8 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
-using EnvDTE;
 using System.Collections.Generic;
 using Microsoft.Web.Administration;
-using EnvDTE80;
 
 namespace wwwsysnetpekr.AttachToW3WP
 {
@@ -57,7 +55,7 @@ namespace wwwsysnetpekr.AttachToW3WP
         // Overridden Package Implementation
         #region Package Members
 
-        private DTE2 _applicationObject;
+        private EnvDTE80.DTE2 _applicationObject;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -128,6 +126,8 @@ namespace wwwsysnetpekr.AttachToW3WP
                 ShowMessage("Startup project is not a web project type or \"Use Local IIS Web server\" is not checked.");
                 return null;
             }
+
+            Trace.WriteLine("IIS Project: " + metabasePath);
 
             try
             {
@@ -209,7 +209,7 @@ namespace wwwsysnetpekr.AttachToW3WP
                 return string.Empty;
             }
 
-            Project prj = GetProject(_applicationObject.Solution, uniqueName);
+            EnvDTE.Project prj = GetProject(_applicationObject.Solution as EnvDTE80.Solution2, uniqueName);
             if (prj == null)
             {
                 return string.Empty;
@@ -217,7 +217,7 @@ namespace wwwsysnetpekr.AttachToW3WP
 
             foreach (var prop in prj.Properties)
             {
-                Property property = prop as Property;
+                EnvDTE.Property property = prop as EnvDTE.Property;
 
                 object objValue = null;
 
@@ -232,7 +232,12 @@ namespace wwwsysnetpekr.AttachToW3WP
 
                 if (property.Name == propName)
                 {
-                    return objValue as string;
+                    if (objValue != null)
+                    {
+                        return objValue.ToString();
+                    }
+
+                    return string.Empty;
                 }
             }
 
@@ -241,14 +246,14 @@ namespace wwwsysnetpekr.AttachToW3WP
 
         private void AttachToW3wp(List<int> currentWorkerProcess)
         {
-            System.Diagnostics.Trace.WriteLine("AttachToW3WP ...");
-
-            EnvDTE90.Debugger3 dbg2 = _applicationObject.Debugger as EnvDTE90.Debugger3;
+            EnvDTE80.Debugger2 dbg2 = _applicationObject.Debugger as EnvDTE80.Debugger2;
             EnvDTE80.Transport transport = dbg2.Transports.Item("Default");
 
             EnvDTE80.Engine dbgEngine = null;
 
             string targetVersion = GetFrameworkVersion();
+
+            Trace.WriteLine("Attach Debug Engine: " + targetVersion);
 
             foreach (EnvDTE80.Engine item in transport.Engines)
             {
@@ -265,9 +270,13 @@ namespace wwwsysnetpekr.AttachToW3WP
                 return;
             }
 
-            foreach (var proc in _applicationObject.Debugger.LocalProcesses)
+            Trace.WriteLine("Debug Engine Type: " + dbgEngine.Name);
+
+            EnvDTE80.Process2 w3wpProcess = null;
+
+            foreach (var proc in dbg2.LocalProcesses)
             {
-                EnvDTE90.Process3 process = proc as EnvDTE90.Process3;
+                EnvDTE80.Process2 process = proc as EnvDTE80.Process2;
                 if (process == null)
                 {
                     continue;
@@ -281,30 +290,48 @@ namespace wwwsysnetpekr.AttachToW3WP
 
                 if (process.Name.IndexOf("W3WP.EXE", 0, StringComparison.OrdinalIgnoreCase) != -1)
                 {
-                    bool attached = false;
-                    string txt = string.Format("{0}({1})", process.Name, process.ProcessID);
-                    System.Diagnostics.Trace.WriteLine("Attaching to: " + txt);
-                    try
-                    {
-                        process.Attach2(dbgEngine);
-                        attached = true;
-                        System.Diagnostics.Trace.WriteLine("Attached to: " + txt);
-                    }
-                    catch
-                    {
-                    }
-
-                    if (attached == true)
-                    {
-                        string startupUrl = GetProjectItemValue("WebApplication.IISUrl");
-                        if (string.IsNullOrEmpty(startupUrl) == false)
-                        {
-                            RunInternetExplorer(startupUrl);
-                        }
-                    }
-
+                    w3wpProcess = process;
                     break;
                 }
+            }
+
+            if (w3wpProcess != null)
+            {
+                bool attached = false;
+                string txt = string.Format("{0}({1})", w3wpProcess.Name, w3wpProcess.ProcessID);
+                System.Diagnostics.Trace.WriteLine("Attaching to: " + txt);
+                try
+                {
+                     // I don't know why Attach2 method hang 
+                     //              when Visual Studio 2013 try to attach w3wp.exe hosting .NET 2.0/3.0/3.5 Web Application.
+                     if (targetVersion == "v2.0")
+                     {
+                         w3wpProcess.Attach();
+                     }
+                     else
+                     {
+                         w3wpProcess.Attach2(dbgEngine);
+                     }
+
+                    attached = true;
+                    System.Diagnostics.Trace.WriteLine("Attached to: " + txt);
+                }
+                catch
+                {
+                }
+
+                if (attached == true)
+                {
+                    string startupUrl = GetProjectItemValue("WebApplication.IISUrl");
+                    if (string.IsNullOrEmpty(startupUrl) == false)
+                    {
+                        RunInternetExplorer(startupUrl);
+                    }
+                }
+            }
+            else
+            {
+                ShowMessage("Make sure the AppPool's Start Mode is AlwaysRunning");
             }
         }
 
@@ -320,20 +347,43 @@ namespace wwwsysnetpekr.AttachToW3WP
 
             txt = result.ToString("X");
 
-            string major = txt.Substring(0, 1);
-            string minor = txt.Substring(1, 1);
+            int major = GetVersionPart(txt, 0, 1);
+            int minor = GetVersionPart(txt, 3, 2);
 
-            return string.Format("v{0}.{1}", major, minor);
+            txt = string.Format("v{0}.{1}", major, minor);
+
+            switch (txt)
+            {
+                case "v2.0":
+                case "v3.0":
+                case "v3.5":
+                    return "v2.0";
+            }
+
+            return txt;
+        }
+
+        private int GetVersionPart(string txt, int startPos, int length)
+        {
+            txt = txt.Substring(startPos, length);
+
+            int result;
+            if (Int32.TryParse(txt, out result) == false)
+            {
+                return 0;
+            }
+
+            return result;
         }
 
         // http://social.msdn.microsoft.com/Forums/vstudio/en-US/36adcd56-5698-43ca-bcba-4527daabb2e3/finding-the-startup-project-in-a-complicated-solution
-        public static Project GetProject(Solution solution, string uniqueName)
+        public static EnvDTE.Project GetProject(EnvDTE80.Solution2 solution, string uniqueName)
         {
-            Project ret = null;
+            EnvDTE.Project ret = null;
 
             if (solution != null && uniqueName != null)
             {
-                foreach (Project p in solution.Projects)
+                foreach (EnvDTE.Project p in solution.Projects)
                 {
                     ret = GetSubProject(p, uniqueName);
 
@@ -349,9 +399,9 @@ namespace wwwsysnetpekr.AttachToW3WP
         public const string vsProjectKindSolutionItems = "{66A26720-8FB5-11D2-AA7E-00C04F688DDE}";
 
         // http://social.msdn.microsoft.com/Forums/vstudio/en-US/36adcd56-5698-43ca-bcba-4527daabb2e3/finding-the-startup-project-in-a-complicated-solution
-        public static Project GetSubProject(Project project, string uniqueName)
+        public static EnvDTE.Project GetSubProject(EnvDTE.Project project, string uniqueName)
         {
-            Project ret = null;
+            EnvDTE.Project ret = null;
 
             if (project != null)
             {
@@ -362,7 +412,7 @@ namespace wwwsysnetpekr.AttachToW3WP
                 else if (project.Kind == vsProjectKindSolutionItems)
                 {
                     // Solution folder  
-                    foreach (ProjectItem projectItem in project.ProjectItems)
+                    foreach (EnvDTE.ProjectItem projectItem in project.ProjectItems)
                     {
                         ret = GetSubProject(projectItem.SubProject, uniqueName);
 
