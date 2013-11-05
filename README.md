@@ -13,6 +13,9 @@ AttachToW3WP: http://visualstudiogallery.msdn.microsoft.com/14b2a959-446f-406c-b
 
 Change Log
 ================================
+1.1 - Dec 05, 2013
+
+* Bug fixed - Hang when Visual Studio 2013 attach to .NET 2.0 web application.
 
 1.0 - Dec 02, 2013
 
